@@ -94,7 +94,7 @@ export default function Review() {
         </>
       )}
 
-      <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-[calc(6rem+env(safe-area-inset-bottom))] z-50 flex justify-center px-5 md:bottom-8">
+      <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-[calc(var(--nav-h)+0.75rem)] z-50 flex justify-center px-5 md:bottom-8">
         {toast && (
           <div className="pointer-events-auto max-w-sm rounded-2xl bg-text px-4 py-3 text-sm font-medium text-surface shadow-lg">{toast}</div>
         )}

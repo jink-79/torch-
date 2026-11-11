@@ -76,6 +76,16 @@
   --font-sans: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
 }
 
+/*
+ * Bottom nav geometry (phones). The home indicator needs ~20px of clearance, not the full 34px
+ * safe-area inset, so the bar sits low like a native tab bar. Anything pinned above the nav
+ * (sticky buttons, toasts) uses --nav-h so it stays aligned.
+ */
+:root {
+  --nav-pad-bottom: max(6px, calc(env(safe-area-inset-bottom) - 14px));
+  --nav-h: calc(3.625rem + var(--nav-pad-bottom));
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
