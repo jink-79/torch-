@@ -67,7 +67,7 @@ export function AppShell() {
         </div>
       </aside>
 
-      <main className="min-w-0 flex-1 pt-[env(safe-area-inset-top)] pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:pb-12">
+      <main className="min-w-0 flex-1 pt-[env(safe-area-inset-top)] pb-[calc(var(--nav-h)+1.5rem)] md:pb-12">
         <div className="mx-auto w-full max-w-xl px-5 md:max-w-3xl md:px-10">
           <Outlet />
         </div>
@@ -76,7 +76,7 @@ export function AppShell() {
       {/* Bottom nav: phones */}
       <nav
         aria-label="Main"
-        className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-border bg-surface/95 px-1 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur md:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-border bg-surface px-1 pt-1.5 pb-(--nav-pad-bottom) md:hidden"
       >
         {navItems.map((item) => (
           <NavLink

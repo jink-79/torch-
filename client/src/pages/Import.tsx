@@ -232,7 +232,7 @@ function PreviewStep({
       </Card>
 
       {/* Sticky confirm bar: sits above the bottom nav on phones */}
-      <div className="sticky bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-30 -mx-5 mt-4 bg-gradient-to-t from-bg via-bg to-bg/0 px-5 pt-6 pb-2 md:bottom-0 md:-mx-10 md:px-10 md:pb-6">
+      <div className="sticky bottom-(--nav-h) z-30 -mx-5 mt-4 bg-gradient-to-t from-bg via-bg to-bg/0 px-5 pt-6 pb-2 md:bottom-0 md:-mx-10 md:px-10 md:pb-6">
         {error && (
           <p role="alert" className="mb-2 text-sm font-medium text-danger">
             {error}
