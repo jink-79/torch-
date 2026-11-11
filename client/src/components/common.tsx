@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { Link } from 'react-router'
 
 import { formatMonth, shiftMonth } from '@/lib/dates'
 import { formatPaise } from '@/lib/money'
@@ -12,6 +13,15 @@ export function PageHeader({ title, children, className }: { title: ReactNode; c
       <h1 className="text-[22px] font-bold tracking-tight md:text-[28px]">{title}</h1>
       {children}
     </header>
+  )
+}
+
+/** Phone-only back link for screens that have no tab of their own. */
+export function BackLink({ to, label }: { to: string; label: string }) {
+  return (
+    <Link to={to} className="-ml-2 mt-2 -mb-3 inline-flex h-11 items-center gap-0.5 rounded-xl pr-3 pl-1 text-[15px] font-medium text-accent md:hidden">
+      <ChevronLeft className="size-5" /> {label}
+    </Link>
   )
 }
 

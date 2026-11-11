@@ -2,7 +2,7 @@ import { useId, useState, type FormEvent } from 'react'
 import { CircleAlert, CircleCheck, FileText, FileUp } from 'lucide-react'
 import { Link } from 'react-router'
 
-import { Amount, Card, PageHeader, sourceLabel, typeLabel } from '@/components/common'
+import { Amount, BackLink, Card, PageHeader, sourceLabel, typeLabel } from '@/components/common'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -63,6 +63,7 @@ function PickStep({ onPreview }: { onPreview: (p: ImportPreview) => void }) {
 
   return (
     <>
+      <BackLink to="/" label="Home" />
       <PageHeader title="Import" />
       <form onSubmit={onSubmit} className="flex flex-col gap-5">
         <div className="flex flex-col gap-2">
@@ -249,6 +250,7 @@ function PreviewStep({
 function ImportDone({ result, onAgain }: { result: ImportResult; onAgain: () => void }) {
   return (
     <>
+      <BackLink to="/" label="Home" />
       <PageHeader title="Import" />
       <Card className="flex flex-col items-center gap-4 px-6 py-10 text-center">
         <span className="flex size-14 items-center justify-center rounded-2xl bg-accent-soft text-accent">

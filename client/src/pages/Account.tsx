@@ -1,6 +1,5 @@
 import { useState, type ReactNode } from 'react'
-import { Bell, CalendarClock, ChevronRight, Info, LogOut, Monitor, Moon, SlidersHorizontal, Sun } from 'lucide-react'
-import { Link } from 'react-router'
+import { Bell, CalendarClock, Info, LogOut, Monitor, Moon, Sun } from 'lucide-react'
 
 import { useAuth } from '@/auth/AuthProvider'
 import { Avatar } from '@/components/Avatar'
@@ -159,7 +158,6 @@ export default function Account() {
 
         {/* More */}
         <Group title="More">
-          <LinkRow to="/rules" icon={<SlidersHorizontal />} label="Rules" hint="How payments get categorised" />
           <button
             type="button"
             onClick={logout}
@@ -202,18 +200,6 @@ function ToggleRow({ id, label, hint, checked, onChange }: { id: string; label: 
   )
 }
 
-function LinkRow({ to, icon, label, hint }: { to: string; icon: ReactNode; label: string; hint: string }) {
-  return (
-    <Link to={to} className="flex min-h-15 items-center gap-3 px-4 py-3 hover:bg-surface-2/60 [&>svg:first-child]:size-5 [&>svg:first-child]:text-muted">
-      {icon}
-      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className="text-[15px] font-medium">{label}</span>
-        <span className="text-[13px] text-muted">{hint}</span>
-      </span>
-      <ChevronRight className="size-5 text-muted" />
-    </Link>
-  )
-}
 
 const themeOptions: { value: ThemePreference; label: string; icon: ReactNode }[] = [
   { value: 'system', label: 'System', icon: <Monitor /> },
