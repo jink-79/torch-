@@ -1,10 +1,16 @@
 {
   "name": "torch",
   "private": true,
-  "workspaces": ["client"],
+  "workspaces": [
+    "client",
+    "server"
+  ],
   "scripts": {
     "dev": "npm run dev -w client",
-    "build": "npm run build -w client",
-    "typecheck": "npm exec -w client -- tsc -b"
+    "dev:server": "npm run dev -w server",
+    "build": "npm run build -w client && npm run build -w server",
+    "typecheck": "npm exec -w client -- tsc -b && npm run typecheck -w server",
+    "test": "npm run test -w server",
+    "setup-user": "npm run setup-user -w server"
   }
 }
