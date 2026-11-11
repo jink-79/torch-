@@ -133,7 +133,7 @@ export function CategoryGrid({
   onPick: (id: string) => void
 }) {
   return (
-    <div role="radiogroup" aria-label="Category" className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+    <div role="radiogroup" aria-label="Category" className="grid grid-cols-3 gap-2">
       {categories.map((c) => {
         const on = c.id === value
         return (
@@ -144,7 +144,7 @@ export function CategoryGrid({
             aria-checked={on}
             onClick={() => onPick(c.id)}
             className={cn(
-              'h-13 cursor-pointer rounded-xl border border-border bg-surface px-4 text-left text-[15px] font-medium transition-colors hover:bg-surface-2 active:bg-surface-2',
+              'h-12 min-w-0 cursor-pointer truncate rounded-xl border border-border bg-surface px-3 text-left text-[15px] font-medium transition-colors hover:bg-surface-2 active:bg-surface-2',
               on && 'border-accent bg-accent text-on-accent hover:bg-accent active:bg-accent',
             )}
           >
