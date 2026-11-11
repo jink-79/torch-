@@ -8,8 +8,17 @@
     <meta name="description" content="Personal expense tracker" />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="referrer" content="no-referrer" />
-    <meta name="color-scheme" content="light" />
+    <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#f4f6f7" />
+    <script>
+      // Apply the saved theme before first paint (no white flash in dark mode). Mirrors src/lib/theme.ts.
+      try {
+        var t = localStorage.getItem('torch.theme')
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t
+        var dark = t === 'dark' || (t !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches)
+        if (dark) document.querySelector('meta[name="theme-color"]').content = '#0e1518'
+      } catch (e) {}
+    </script>
 
     <!-- iPhone "Add to Home Screen" -->
     <meta name="apple-mobile-web-app-capable" content="yes" />

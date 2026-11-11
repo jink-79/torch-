@@ -6,10 +6,11 @@
  * This is the ONE place colours are defined. Change a value here and the whole app follows.
  * Components use the Tailwind names on the right (bg-surface, text-muted, bg-accent ...).
  *
- * Dark mode: not designed yet. Add a `@media (prefers-color-scheme: dark)` block
- * overriding these same variables when we pick dark values.
+ * Theme: <html data-theme="light|dark"> forces a theme; no attribute follows the system.
+ * Dark values are overridden below and must keep the same variable names.
  */
 :root {
+  color-scheme: light;
   --bg: #f4f6f7;          /* page background */
   --surface: #ffffff;     /* cards, sheets, nav */
   --surface-2: #e8edf0;   /* subtle fills: chips, bar tracks, segmented controls */
@@ -20,6 +21,7 @@
   --accent-soft: #dcefee; /* tinted backgrounds for accent callouts */
   --on-accent: #ffffff;   /* text on --accent */
   --danger: #b42318;      /* destructive actions only (delete rule) */
+  --raised: #ffffff;      /* selected segment in a segmented control */
 
   --radius: 0.875rem;
 
@@ -38,6 +40,41 @@
   --destructive: var(--danger);
   --input: var(--border);
   --ring: var(--accent);
+  --scrim: rgb(15 26 32 / 0.35);
+}
+
+/* Ink, dark. Every text pair is >= 5:1. On dark, the accent is lighter and text on it is dark. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0e1518;
+    --surface: #162024;
+    --surface-2: #1f2b30;
+    --border: #2a383e;
+    --text: #e6edf0;
+    --muted: #95a6ae;
+    --accent: #4fbfc4;
+    --accent-soft: #15363a;
+    --on-accent: #052326;
+    --danger: #f97066;
+    --raised: #33444b;
+    --scrim: rgb(0 0 0 / 0.55);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0e1518;
+  --surface: #162024;
+  --surface-2: #1f2b30;
+  --border: #2a383e;
+  --text: #e6edf0;
+  --muted: #95a6ae;
+  --accent: #4fbfc4;
+  --accent-soft: #15363a;
+  --on-accent: #052326;
+  --danger: #f97066;
+  --raised: #33444b;
+  --scrim: rgb(0 0 0 / 0.55);
 }
 
 @theme inline {
@@ -51,6 +88,7 @@
   --color-accent-soft: var(--accent-soft);
   --color-on-accent: var(--on-accent);
   --color-danger: var(--danger);
+  --color-raised: var(--raised);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);

@@ -112,3 +112,27 @@ export interface ReviewDecision {
   categoryId: string | null
   createRule: boolean
 }
+
+export type ThemePreference = 'system' | 'light' | 'dark'
+export type ImportFrequency = 'off' | 'weekly' | 'monthly'
+
+export interface Preferences {
+  /** Shown in the avatar and greeting. Defaults to the username. */
+  displayName: string
+  theme: ThemePreference
+  notifications: {
+    /** Nudge when items are waiting in Review. */
+    reviewReminders: boolean
+    /** Nudge on the import schedule below. */
+    importReminders: boolean
+  }
+  importSchedule: {
+    frequency: ImportFrequency
+    /** 0 = Sunday ... 6 = Saturday. Used when weekly. */
+    weekday: number
+    /** 1–28 so every month has it. Used when monthly. */
+    dayOfMonth: number
+    /** Hour of day in IST, 0–23. */
+    hour: number
+  }
+}

@@ -2,9 +2,11 @@ import { LogOut } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router'
 
 import { useAuth } from '@/auth/AuthProvider'
+import { Avatar } from '@/components/Avatar'
 import { Wordmark } from '@/components/Logo'
 import { getReviewCount } from '@/lib/api'
 import { useApi } from '@/lib/hooks'
+import { usePreferences } from '@/lib/preferences'
 import { cn } from '@/lib/utils'
 import { navItems } from './nav-items'
 
@@ -25,6 +27,9 @@ function CountBadge({ count, className }: { count: number; className?: string })
 export function AppShell() {
   const { data: reviewCount = 0 } = useApi(getReviewCount, [])
   const { logout, username } = useAuth()
+  const { prefs } = usePreferences()
+  const name = prefs?.displayName || username || 'Account'
+  const firstName = name.split(/\s+/)[0]
 
   return (
     <div className="min-h-dvh md:flex">
@@ -32,7 +37,7 @@ export function AppShell() {
       <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r border-border bg-surface px-3 py-5 md:flex">
         <Wordmark className="px-3 pb-6" />
         <nav aria-label="Main" className="flex flex-col gap-1">
-          {navItems.map((item) => (
+          {navItems.filter((i) => i.in.includes('sidebar')).map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
@@ -46,7 +51,7 @@ export function AppShell() {
             >
               {({ isActive }) => (
                 <>
-                  <item.icon className={cn('size-5', isActive && 'text-accent')} />
+                  {item.icon && <item.icon className={cn('size-5', isActive && 'text-accent')} />}
                   <span className="flex-1">{item.label}</span>
                   {item.badge === 'review' && <CountBadge count={reviewCount} />}
                 </>
@@ -54,8 +59,22 @@ export function AppShell() {
             </NavLink>
           ))}
         </nav>
-        <div className="mt-auto flex items-center justify-between gap-2 border-t border-border px-3 pt-4">
-          <span className="truncate text-sm text-muted">{username}</span>
+        <div className="mt-auto flex items-center gap-1 border-t border-border pt-3">
+          <NavLink
+            to="/account"
+            className={({ isActive }) =>
+              cn(
+                'flex h-12 min-w-0 flex-1 items-center gap-3 rounded-xl px-2 hover:bg-surface-2',
+                isActive && 'bg-accent-soft hover:bg-accent-soft',
+              )
+            }
+          >
+            <Avatar className="size-8 text-sm" />
+            <span className="flex min-w-0 flex-col">
+              <span className="truncate text-sm font-semibold">{name}</span>
+              <span className="truncate text-xs text-muted">Preferences</span>
+            </span>
+          </NavLink>
           <button
             type="button"
             onClick={logout}
@@ -78,21 +97,33 @@ export function AppShell() {
         aria-label="Main"
         className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-border bg-surface px-1 pt-1.5 pb-(--nav-pad-bottom) md:hidden"
       >
-        {navItems.map((item) => (
+        {navItems.filter((i) => i.in.includes('bottom')).map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             end={item.to === '/'}
+            aria-label={item.icon ? undefined : 'Account'}
             className={({ isActive }) =>
               cn(
-                'relative flex h-13 flex-col items-center justify-center gap-1 text-[11px] font-medium text-muted',
+                'relative flex h-13 min-w-0 flex-col items-center justify-center gap-1 text-[11px] font-medium text-muted',
                 isActive && 'font-semibold text-accent',
               )
             }
           >
-            <item.icon className="size-[22px]" />
-            {item.label}
-            {item.badge === 'review' && <CountBadge count={reviewCount} className="absolute top-0 left-1/2 ml-1.5" />}
+            {({ isActive }) =>
+              item.icon ? (
+                <>
+                  <item.icon className="size-[22px]" />
+                  {item.label}
+                  {item.badge === 'review' && <CountBadge count={reviewCount} className="absolute top-0 left-1/2 ml-1.5" />}
+                </>
+              ) : (
+                <>
+                  <Avatar active={isActive} className="size-[24px] text-[12px]" />
+                  <span className="max-w-full truncate px-1">{firstName}</span>
+                </>
+              )
+            }
           </NavLink>
         ))}
       </nav>

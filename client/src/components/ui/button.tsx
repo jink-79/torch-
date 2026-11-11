@@ -14,7 +14,7 @@ const buttonVariants = cva(
         secondary: 'bg-surface-2 text-text hover:bg-surface-2/70',
         ghost: 'text-text hover:bg-surface-2',
         link: 'text-accent underline-offset-4 hover:underline',
-        destructive: 'bg-danger text-white hover:bg-danger/90',
+        destructive: 'bg-danger text-bg hover:bg-danger/90',
       },
       size: {
         // 44px minimum everywhere: these are tap targets on a phone.
