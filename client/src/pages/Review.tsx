@@ -67,7 +67,7 @@ export default function Review() {
         </EmptyState>
       ) : (
         <>
-          <div className="mb-3.5 flex flex-col gap-2">
+          <div className="mb-3 flex flex-col gap-1.5">
             <div
               className="h-1 overflow-hidden rounded-full bg-surface-2"
               role="progressbar"
@@ -131,7 +131,7 @@ function ReviewItem({ item, onResolved }: { item: Transaction; onResolved: (mess
 
   return (
     <div className="flex flex-col gap-3.5 md:gap-5">
-      <Card className="flex flex-col gap-3 p-5">
+      <Card className="flex flex-col gap-2.5 p-4 md:gap-3 md:p-5">
         <div className="flex flex-wrap gap-2">
           {item.isPersonToPerson && <Badge>Person-to-person</Badge>}
           {item.conflicts?.length ? (
@@ -143,7 +143,7 @@ function ReviewItem({ item, onResolved }: { item: Transaction; onResolved: (mess
           )}
         </div>
         <div className="flex flex-col gap-0.5">
-          <span className="text-[36px] leading-tight font-bold tracking-[-0.025em]">
+          <span className="text-[32px] leading-tight md:text-[36px] font-bold tracking-[-0.025em]">
             {formatPaise(item.amountPaise, { paise: true, sign: item.direction === 'credit' ? '+' : null })}
           </span>
           <span className="text-[17px] font-medium">
