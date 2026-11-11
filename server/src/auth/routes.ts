@@ -13,10 +13,10 @@ const loginBody = z.object({
 })
 
 /** The only route reachable without a session. There is deliberately no register route. */
-export function publicAuthRouter(env: Env) {
+export function publicAuthRouter(env: Env, persistentRateLimits: boolean) {
   const router = Router()
 
-  router.post('/login', ...loginLimiters(), async (req, res) => {
+  router.post('/login', ...loginLimiters(persistentRateLimits), async (req, res) => {
     const parsed = loginBody.safeParse(req.body)
     if (!parsed.success) {
       res.status(400).json({ error: 'invalid_request' })

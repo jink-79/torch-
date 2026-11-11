@@ -12,7 +12,15 @@ import { isProd, type Env } from './config/env.js'
 
 const CLIENT_DIST = path.resolve(import.meta.dirname, '../../client/dist')
 
-export function createApp(env: Env) {
+export interface AppOptions {
+  /** Keep login rate-limit counters in MongoDB (needed on serverless). Defaults to true in production. */
+  persistentRateLimits?: boolean
+  /** More origins allowed to send state-changing requests, e.g. the current Vercel deployment URL. */
+  extraOrigins?: string[]
+}
+
+export function createApp(env: Env, options: AppOptions = {}) {
+  const persistentRateLimits = options.persistentRateLimits ?? isProd(env)
   const app = express()
   app.disable('x-powered-by')
   app.set('trust proxy', env.TRUST_PROXY)
@@ -27,10 +35,10 @@ export function createApp(env: Env) {
     res.set('Cache-Control', 'no-store')
     next()
   })
-  api.use(checkOrigin(env))
+  api.use(checkOrigin(env, options.extraOrigins))
 
   // Public: sign-in only.
-  api.use('/auth', publicAuthRouter(env))
+  api.use('/auth', publicAuthRouter(env, persistentRateLimits))
 
   // Everything below needs a session, including unknown paths (they answer 401, not 404).
   api.use(requireAuth(env))

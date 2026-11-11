@@ -1,11 +1,9 @@
 /**
- * API client.
+ * API client. Pages only talk to the backend through this file.
  *
- * TEMPORARY: everything below is an in-memory MOCK so the UI can be built before the Express API exists.
- * The function signatures are the contract; when the server lands, each body becomes a fetch() to /api/...
- * with `credentials: 'same-origin'`. Pages must only talk to the backend through this file.
- *
- * The mock login accepts any non-empty username and password. It is not security; it is a placeholder.
+ * - Auth (me / login / logout) is REAL: it calls the Express API at /api/auth/* with the session cookie.
+ * - Everything else is still an in-memory MOCK with synthetic data until the Phase 2 endpoints exist.
+ *   The function signatures are the contract; each body becomes a request() call when its endpoint lands.
  */
 import { monthKey } from './dates'
 import { buildSeedTransactions, seedCategories, seedRules } from './mock-data'
@@ -56,41 +54,60 @@ export class ApiError extends Error {
 }
 
 // ---------------------------------------------------------------------------
-// Auth
+// HTTP
 
-const AUTH_KEY = 'torch.mockSession'
-
-function readSession(): string | null {
-  try {
-    return sessionStorage.getItem(AUTH_KEY)
-  } catch {
-    return null
-  }
+const friendly: Record<number, string> = {
+  401: 'Wrong username or password.',
+  403: 'This request was blocked.',
+  429: 'Too many attempts. Try again later.',
+  500: 'Something went wrong on the server.',
+  502: 'Can’t reach the server. Try again in a minute.',
+  503: 'The server is unavailable. Try again in a minute.',
+  504: 'The server took too long to answer. Try again.',
 }
 
+/** Same-origin JSON request to the Express API. Throws ApiError with a human message on failure. */
+async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+  let res: Response
+  try {
+    res = await fetch(`/api${path}`, {
+      ...init,
+      credentials: 'same-origin',
+      headers: { 'content-type': 'application/json', accept: 'application/json', ...init.headers },
+    })
+  } catch {
+    throw new ApiError(0, 'Can’t reach the server. Check your connection.')
+  }
+  if (res.status === 204) return undefined as T
+  const body = (await res.json().catch(() => null)) as { message?: string } | null
+  if (!res.ok) throw new ApiError(res.status, body?.message ?? friendly[res.status] ?? 'Something went wrong.')
+  return body as T
+}
+
+// ---------------------------------------------------------------------------
+// Auth (real)
+
+/** null when not signed in. Network or server errors are thrown so the UI can say so. */
 export async function me(): Promise<{ username: string } | null> {
-  const u = readSession()
-  return delay(u ? { username: u } : null, 80)
+  try {
+    return await request<{ username: string }>('/auth/me')
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 401) return null
+    throw err
+  }
 }
 
-export async function login(username: string, password: string): Promise<{ username: string }> {
-  await delay(null, 400)
-  if (!username.trim() || !password) throw new ApiError(401, 'Wrong username or password.')
-  try {
-    sessionStorage.setItem(AUTH_KEY, username.trim())
-  } catch {
-    /* private mode: session just won't survive a reload */
-  }
-  return { username: username.trim() }
+export function login(username: string, password: string): Promise<{ username: string }> {
+  return request('/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) })
 }
 
 export async function logout(): Promise<void> {
   try {
-    sessionStorage.removeItem(AUTH_KEY)
-  } catch {
-    /* ignore */
+    await request<void>('/auth/logout', { method: 'POST' })
+  } catch (err) {
+    // Already signed out on the server: fine.
+    if (!(err instanceof ApiError && err.status === 401)) throw err
   }
-  return delay(undefined, 80)
 }
 
 // ---------------------------------------------------------------------------
@@ -108,8 +125,8 @@ function defaultPreferences(username: string): Preferences {
   }
 }
 
-export async function getPreferences(): Promise<Preferences> {
-  const base = defaultPreferences(readSession() ?? '')
+export async function getPreferences(username: string): Promise<Preferences> {
+  const base = defaultPreferences(username)
   try {
     const saved = JSON.parse(localStorage.getItem(PREFS_KEY) ?? 'null') as Partial<Preferences> | null
     if (saved) {

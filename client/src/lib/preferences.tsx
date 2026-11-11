@@ -14,16 +14,16 @@ interface PreferencesValue {
 const PreferencesContext = createContext<PreferencesValue | null>(null)
 
 export function PreferencesProvider({ children }: { children: ReactNode }) {
-  const { status } = useAuth()
+  const { status, username } = useAuth()
   const [prefs, setPrefs] = useState<Preferences | null>(null)
 
   useEffect(() => {
-    if (status !== 'authed') {
+    if (status !== 'authed' || !username) {
       setPrefs(null)
       return
     }
-    getPreferences().then(setPrefs)
-  }, [status])
+    getPreferences(username).then(setPrefs)
+  }, [status, username])
 
   // Theme: apply on load/change; while on "system", follow iOS light/dark switches.
   const theme = prefs?.theme
