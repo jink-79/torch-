@@ -18,10 +18,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [username, setUsername] = useState<string | null>(null)
 
   useEffect(() => {
-    api.me().then((u) => {
-      setUsername(u?.username ?? null)
-      setStatus(u ? 'authed' : 'anon')
-    })
+    api.me().then(
+      (u) => {
+        setUsername(u?.username ?? null)
+        setStatus(u ? 'authed' : 'anon')
+      },
+      // Server unreachable: show the login screen; signing in will surface the actual error.
+      () => setStatus('anon'),
+    )
   }, [])
 
   const login = useCallback(async (u: string, p: string) => {
@@ -31,9 +35,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const logout = useCallback(async () => {
-    await api.logout()
-    setUsername(null)
-    setStatus('anon')
+    try {
+      await api.logout()
+    } finally {
+      // Even if the server can't be reached, leave the signed-in UI.
+      setUsername(null)
+      setStatus('anon')
+    }
   }, [])
 
   const value = useMemo(() => ({ status, username, login, logout }), [status, username, login, logout])

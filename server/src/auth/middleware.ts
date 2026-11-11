@@ -4,6 +4,7 @@ import { isValidObjectId } from 'mongoose'
 
 import { isProd, type Env } from '../config/env.js'
 import { User } from '../models/User.js'
+import { MongoRateLimitStore } from './rate-limit-store.js'
 import { clearCookieOptions, cookieName, verifySession } from './session.js'
 
 declare global {
@@ -40,9 +41,9 @@ export function requireAuth(env: Env): RequestHandler {
  * CSRF defence in depth on top of SameSite=Strict: a browser always sends Origin on cross-site
  * state-changing requests, so reject any that don't come from the app.
  */
-export function checkOrigin(env: Env): RequestHandler {
+export function checkOrigin(env: Env, extraOrigins: string[] = []): RequestHandler {
   const allowed = new Set<string>()
-  if (env.APP_ORIGIN) allowed.add(new URL(env.APP_ORIGIN).origin)
+  for (const o of [env.APP_ORIGIN, ...extraOrigins]) if (o) allowed.add(new URL(o).origin)
   if (!isProd(env)) allowed.add('http://localhost:5173')
   return (req, res, next) => {
     if (req.method === 'GET' || req.method === 'HEAD' || req.method === 'OPTIONS') return next()
@@ -63,11 +64,23 @@ const tooMany: RequestHandler = (_req, res) => {
  * Two limits on failed sign-ins (successful ones don't count):
  *  - per IP: 10 per 15 minutes
  *  - overall: 30 per hour, so guessing spread across many IPs is also capped (single-user app).
+ * `persistent` keeps the counters in MongoDB so they survive serverless cold starts; tests use memory.
  */
-export function loginLimiters(): RequestHandler[] {
+export function loginLimiters(persistent: boolean): RequestHandler[] {
   const common = { standardHeaders: 'draft-8' as const, legacyHeaders: false, skipSuccessfulRequests: true, handler: tooMany }
   return [
-    rateLimit({ ...common, windowMs: 15 * 60 * 1000, limit: 10 }),
-    rateLimit({ ...common, windowMs: 60 * 60 * 1000, limit: 30, keyGenerator: () => 'all-logins' }),
+    rateLimit({
+      ...common,
+      windowMs: 15 * 60 * 1000,
+      limit: 10,
+      ...(persistent && { store: new MongoRateLimitStore('login-ip') }),
+    }),
+    rateLimit({
+      ...common,
+      windowMs: 60 * 60 * 1000,
+      limit: 30,
+      keyGenerator: () => 'all',
+      ...(persistent && { store: new MongoRateLimitStore('login-all') }),
+    }),
   ]
 }

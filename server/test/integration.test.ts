@@ -74,6 +74,21 @@ describe.skipIf(!uri)('auth against a real database', () => {
     expect(me.status).toBe(401)
   })
 
+  it('MongoDB rate-limit store counts, decrements, expires and resets', async () => {
+    const { MongoRateLimitStore } = await import('../src/auth/rate-limit-store.js')
+    const store = new MongoRateLimitStore('test')
+    store.init({ windowMs: 1_000 } as never)
+    expect((await store.increment('k')).totalHits).toBe(1)
+    expect((await store.increment('k')).totalHits).toBe(2)
+    await store.decrement('k')
+    expect((await store.get('k'))?.totalHits).toBe(1)
+    await new Promise((r) => setTimeout(r, 1_100))
+    expect(await store.get('k')).toBeUndefined()
+    expect((await store.increment('k')).totalHits).toBe(1) // expired window starts fresh
+    await store.resetKey('k')
+    expect(await store.get('k')).toBeUndefined()
+  })
+
   it('logout clears the cookie', async () => {
     const cookie = cookieFrom(await login('owner', password))
     const res = await fetch(`${app.base}/api/auth/logout`, { method: 'POST', headers: { cookie } })
