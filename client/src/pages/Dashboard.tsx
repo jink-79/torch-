@@ -1,13 +1,14 @@
-import { FileUp, PieChart } from 'lucide-react'
+import { ChevronRight, FileUp, PieChart } from 'lucide-react'
 import { Link } from 'react-router'
 
 import { Card, EmptyState, MonthSwitcher, PageHeader, Skeleton } from '@/components/common'
 import { Wordmark } from '@/components/Logo'
 import { Button } from '@/components/ui/button'
 import { getDashboard } from '@/lib/api'
-import { formatMonthLong } from '@/lib/dates'
+import { formatMonthLong, formatWeekday, nextScheduled } from '@/lib/dates'
 import { useApi, useCategories, useMonth } from '@/lib/hooks'
 import { formatPaise } from '@/lib/money'
+import { usePreferences } from '@/lib/preferences'
 
 export default function Dashboard() {
   const [month, setMonth] = useMonth()
@@ -21,6 +22,8 @@ export default function Dashboard() {
       <PageHeader title={<><Wordmark className="md:hidden" /><span className="hidden md:inline">Home</span></>}>
         <MonthSwitcher month={month} onChange={setMonth} />
       </PageHeader>
+
+      <ImportCard />
 
       {error && <p role="alert" className="text-sm text-danger">Couldn’t load this month. {error.message}</p>}
 
@@ -105,5 +108,28 @@ export default function Dashboard() {
         </div>
       )}
     </>
+  )
+}
+
+/** Entry point to Import on phones (it has no tab). Opens the same Import screen. */
+function ImportCard() {
+  const { prefs } = usePreferences()
+  const next = prefs ? nextScheduled(prefs.importSchedule) : null
+  const hint = next ? `Next import due ${formatWeekday(next)}` : 'PhonePe CSV · preview before anything is saved'
+
+  return (
+    <Link
+      to="/import"
+      className="mb-3.5 flex min-h-[72px] items-center gap-3.5 rounded-[18px] border border-border bg-surface py-3.5 pr-3 pl-4 transition-colors hover:bg-surface-2/60 active:bg-surface-2 md:mb-5"
+    >
+      <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-accent text-on-accent" aria-hidden="true">
+        <FileUp className="size-5" />
+      </span>
+      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <span className="text-[15px] font-semibold">Import a statement</span>
+        <span className="truncate text-[13px] text-muted">{hint}</span>
+      </span>
+      <ChevronRight className="size-5 shrink-0 text-muted" aria-hidden="true" />
+    </Link>
   )
 }
