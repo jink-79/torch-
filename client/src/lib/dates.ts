@@ -34,3 +34,32 @@ function monthDate(month: string) {
 
 export const formatMonth = (month: string) => monthFmt.format(monthDate(month))
 export const formatMonthLong = (month: string) => monthLongFmt.format(monthDate(month))
+
+/** India has no DST, so IST is a fixed +05:30. */
+const IST_OFFSET_MS = 330 * 60 * 1000
+
+/**
+ * Next reminder instant for a weekly (weekday 0–6) or monthly (day 1–28) schedule at `hour` IST.
+ * Returns an ISO string, or null when the schedule is off.
+ */
+export function nextScheduled(
+  s: { frequency: 'off' | 'weekly' | 'monthly'; weekday: number; dayOfMonth: number; hour: number },
+  now = new Date(),
+): string | null {
+  if (s.frequency === 'off') return null
+  // Work in "IST wall-clock expressed as UTC" so the UTC getters read IST fields.
+  const ist = new Date(now.getTime() + IST_OFFSET_MS)
+  const y = ist.getUTCFullYear()
+  const m = ist.getUTCMonth()
+  const d = ist.getUTCDate()
+  let candidate: number
+  if (s.frequency === 'weekly') {
+    const ahead = (s.weekday - ist.getUTCDay() + 7) % 7
+    candidate = Date.UTC(y, m, d + ahead, s.hour)
+    if (candidate <= ist.getTime()) candidate = Date.UTC(y, m, d + ahead + 7, s.hour)
+  } else {
+    candidate = Date.UTC(y, m, s.dayOfMonth, s.hour)
+    if (candidate <= ist.getTime()) candidate = Date.UTC(y, m + 1, s.dayOfMonth, s.hour)
+  }
+  return new Date(candidate - IST_OFFSET_MS).toISOString()
+}

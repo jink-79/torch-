@@ -15,6 +15,7 @@ import type {
   ImportPreview,
   ImportPreviewRow,
   ImportResult,
+  Preferences,
   ReviewDecision,
   Rule,
   Source,
@@ -90,6 +91,49 @@ export async function logout(): Promise<void> {
     /* ignore */
   }
   return delay(undefined, 80)
+}
+
+// ---------------------------------------------------------------------------
+// Preferences (MOCK: kept in this browser's localStorage; the server will store them on the user)
+
+const PREFS_KEY = 'torch.mockPreferences'
+
+function defaultPreferences(username: string): Preferences {
+  const name = username.trim()
+  return {
+    displayName: name ? name.charAt(0).toUpperCase() + name.slice(1) : '',
+    theme: 'system',
+    notifications: { reviewReminders: true, importReminders: true },
+    importSchedule: { frequency: 'weekly', weekday: 0, dayOfMonth: 1, hour: 10 },
+  }
+}
+
+export async function getPreferences(): Promise<Preferences> {
+  const base = defaultPreferences(readSession() ?? '')
+  try {
+    const saved = JSON.parse(localStorage.getItem(PREFS_KEY) ?? 'null') as Partial<Preferences> | null
+    if (saved) {
+      return delay({
+        ...base,
+        ...saved,
+        notifications: { ...base.notifications, ...saved.notifications },
+        importSchedule: { ...base.importSchedule, ...saved.importSchedule },
+      })
+    }
+  } catch {
+    /* corrupted or blocked storage: fall back to defaults */
+  }
+  return delay(base)
+}
+
+export async function updatePreferences(next: Preferences): Promise<Preferences> {
+  const clean: Preferences = { ...next, displayName: next.displayName.trim().slice(0, 40) }
+  try {
+    localStorage.setItem(PREFS_KEY, JSON.stringify(clean))
+  } catch {
+    /* not persisted in private mode */
+  }
+  return delay(clean, 80)
 }
 
 // ---------------------------------------------------------------------------

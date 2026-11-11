@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Pencil, Trash2, Wand2 } from 'lucide-react'
+import { ChevronLeft, Pencil, Trash2, Wand2 } from 'lucide-react'
+import { Link } from 'react-router'
 
 import { EmptyState, PageHeader, SegmentedControl, Skeleton, needsCategory, sourceLabel, typeLabel } from '@/components/common'
 import { Badge } from '@/components/ui/badge'
@@ -37,7 +38,13 @@ export default function Rules() {
 
   return (
     <>
-      <PageHeader title="Rules" />
+      <Link
+        to="/account"
+        className="-ml-2 mt-2 inline-flex h-11 items-center gap-0.5 rounded-xl pr-3 pl-1 text-[15px] font-medium text-accent md:hidden"
+      >
+        <ChevronLeft className="size-5" /> Account
+      </Link>
+      <PageHeader title="Rules" className="pt-0 md:pt-10" />
 
       <SegmentedControl<OriginFilter>
         label="Show"
