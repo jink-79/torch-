@@ -1,0 +1,92 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/*
+ * Torch palette — "B · Ink".
+ * This is the ONE place colours are defined. Change a value here and the whole app follows.
+ * Components use the Tailwind names on the right (bg-surface, text-muted, bg-accent ...).
+ *
+ * Dark mode: not designed yet. Add a `@media (prefers-color-scheme: dark)` block
+ * overriding these same variables when we pick dark values.
+ */
+:root {
+  --bg: #f4f6f7;          /* page background */
+  --surface: #ffffff;     /* cards, sheets, nav */
+  --surface-2: #e8edf0;   /* subtle fills: chips, bar tracks, segmented controls */
+  --border: #dce3e7;
+  --text: #0f1a20;
+  --muted: #56656e;       /* secondary text; 5.6:1 on --surface */
+  --accent: #0f6e74;      /* deep teal; primary actions, active nav */
+  --accent-soft: #dcefee; /* tinted backgrounds for accent callouts */
+  --on-accent: #ffffff;   /* text on --accent */
+  --danger: #b42318;      /* destructive actions only (delete rule) */
+
+  --radius: 0.875rem;
+
+  /* shadcn/ui token aliases — keep these pointing at the palette above */
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--surface);
+  --card-foreground: var(--text);
+  --popover: var(--surface);
+  --popover-foreground: var(--text);
+  --primary: var(--accent);
+  --primary-foreground: var(--on-accent);
+  --secondary: var(--surface-2);
+  --secondary-foreground: var(--text);
+  --muted-foreground: var(--muted);
+  --destructive: var(--danger);
+  --input: var(--border);
+  --ring: var(--accent);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
+  --color-danger: var(--danger);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-destructive: var(--destructive);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 4px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* System UI font: SF Pro on iPhone, no third-party font request from a finance app. */
+  --font-sans: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-bg text-text font-sans antialiased;
+    font-variant-numeric: tabular-nums;
+    overscroll-behavior-y: none;
+  }
+}

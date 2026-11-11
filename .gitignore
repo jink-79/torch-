@@ -1,0 +1,14 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+
+# Never commit real statements or uploads
+uploads/
+data/**/*.csv
+data/**/*.pdf
+
+.DS_Store
+*.log

@@ -1,0 +1,10 @@
+{
+  "name": "torch",
+  "private": true,
+  "workspaces": ["client"],
+  "scripts": {
+    "dev": "npm run dev -w client",
+    "build": "npm run build -w client",
+    "typecheck": "npm exec -w client -- tsc -b"
+  }
+}
